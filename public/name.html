@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf8">
+  <title>名前入力 | クイズゲーム</title>
+  <style>
+    body{
+      width: 100%;
+      text-align: center;
+      background-image: url(image/back_title.jpg);
+      background-size: cover;
+    }
+    #inputwindow{
+      width: 400px;
+      margin: 100px auto;
+      padding: 20px;
+      background-color: rgba(255,255,255,0.8);
+      border-radius: 5px;
+    }
+    h1{
+      font-size: 16pt;
+    }
+    #playername{
+      width: 250px;
+      height: 30px;
+    }
+    #btn-reload{
+      margin-top: 3px;
+    }
+    #btn-enter{
+      margin-top: 10px;
+      width: 100px;
+      height: 35px;
+    }
+  </style>
+</head>
+<body>
+  <div id="inputwindow">
+    <h1>あなたの名前を入力してください</h1>
+
+    <form>
+      <input id="playername" type="text">
+      <button id="btn-reload" type="button">
+        <img src="image/icon_rotate.svg" width="25" height="25">
+      </button>
+      <button id="btn-enter" type="button">決定</button>
+    </form>
+  </div>
+
+<script>
+const playername = document.querySelector('#playername');
+
+// ページの読み込みが完了
+window.addEventListener('load', ()=>{
+  setRandomName();
+})
+
+// 「再セット」ボタン押下
+document.querySelector('#btn-reload').addEventListener('click', ()=>{
+  setRandomName();
+});
+
+// 「決定」ボタン押下
+document.querySelector('#btn-enter').addEventListener('click', ()=>{
+  localStorage.setItem('playername', playername.value);
+  location.href = 'game.html';
+});
+
+/**
+ * 名前をランダムにセット
+ */
+function setRandomName(){
+  const names = ['パンダ', 'アルパカ', 'ぬこ', 'くま', 'イルカ'];
+  const i = Math.floor( (Math.random() * 10) % names.length );
+  playername.value = names[i];
+}
+</script>
+</body>
+</html>
