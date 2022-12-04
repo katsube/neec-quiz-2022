@@ -124,6 +124,7 @@ document.querySelector('#btn-back').addEventListener('click', ()=>{
 // 「つぎへ」ボタン押下
 document.querySelector('#btn-enter').addEventListener('click', ()=>{
   console.log(strCount(playername.value))
+
   // 入力チェック
   if( playername.value === '' || strCount(playername.value) > 12 ){
     alert('名前を正しく入力してください');
@@ -132,7 +133,7 @@ document.querySelector('#btn-enter').addEventListener('click', ()=>{
   }
 
   saveName();
-  //location.href = 'game.html';
+  location.href = 'game.html';
 });
 
 /**
@@ -142,20 +143,6 @@ function setRandomName(){
   const names = ['パンダ', 'アルパカ', 'ぬこ', 'くま', 'イルカ'];
   const i = Math.floor( (Math.random() * 10) % names.length );
   playername.value = names[i];
-}
-
-/**
- * 入力中の名前をlocalStorageへ保存
- */
-function saveName(){
-  localStorage.setItem('playername', playername.value);
-}
-
-/**
- * 名前をlocalStorageから取得
- */
-function loadName(){
-  return localStorage.getItem('playername');    // 存在しない場合はNullが返る
 }
 </script>
 </body>

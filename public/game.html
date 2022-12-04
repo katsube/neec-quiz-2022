@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf8">
+  <title>クイズゲーム</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    #gamewindow{
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<section id="nowmatching">
+  <h1>...マッチング中</h1>
+  <p>Please waiting</p>
+</section>
+
+<section id="gamewindow">
+  <h1>ゲーム開始</h1>
+</section>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/lib.js"></script>
+<script>
+const IAM = {
+  token: null,
+  name: null
+}
+
+//----------------------------------------
+// STEP0. 前画面の情報を取り出す
+//----------------------------------------
+// 自分の名前を取り出す
+IAM.name = loadName();
+if( IAM.name === null ){
+  alert('名前が設定されていません');
+  location.href = 'name.html';  // 名前がない場合は、名前入力画面に遷移
+}
+
+//----------------------------------------
+// STEP1. サーバに接続
+//----------------------------------------
+// サーバに接続
+const socket = io();
+
+// トークンが返ってきたら入室する
+socket.on('token', (token)=>{
+  IAM.token = token;
+
+  // 入室する
+  socket.emit('join', {
+    token,    // token:token と同じ意味になる
+    name      // name:name と同じ意味になる
+  });
+});
+
+// 二人揃ったらサーバから開始の合図が来る
+socket.on('start', (token)=>{
+  // 画面を切り替える
+  document.getElementById('nowmatching').style.display = 'none';
+  document.getElementById('gamewindow').style.display = 'block';
+});
+
+
+//----------------------------------------
+// STEP2. ゲーム開始
+//----------------------------------------
+
+</script>
+</body>
+</html>
