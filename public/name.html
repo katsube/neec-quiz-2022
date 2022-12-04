@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf8">
   <title>名前入力 | クイズゲーム</title>
+  <link rel="stylesheet" href="css/style.css">
   <style>
     body{
       width: 100%;
@@ -27,10 +28,40 @@
     #btn-reload{
       margin-top: 3px;
     }
+    #usericons{
+      margin-top: 30px;
+    }
+    #usericons img{
+      margin-left: 20px;
+    }
+    #btn-back{
+      margin-top: 10px;
+      width: 80px;
+      height: 35px;
+    }
     #btn-enter{
       margin-top: 10px;
       width: 100px;
+      height: 40px;
+      background-color: cornflowerblue;
+      color: white;
+      font-weight: bold;
+      font-size: 12pt;
+    }
+
+    .navbutton{
+      margin-top: 20px;
+      margin-left: 30px;
+      margin-bottom: 10px;
+      width: 350px;
       height: 35px;
+    }
+    .btnleft{
+      float: left;
+      text-align: left;
+    }
+    .btnright{
+      text-align: right;
     }
   </style>
 </head>
@@ -39,20 +70,44 @@
     <h1>あなたの名前を入力してください</h1>
 
     <form>
-      <input id="playername" type="text">
+      <input id="playername" type="text" placeholder="名前を入力してください（12文字以内）">
       <button id="btn-reload" type="button">
-        <img src="image/icon_rotate.svg" width="25" height="25">
+        <img src="image/icon_rotate.svg" width="20" height="20">
       </button>
-      <button id="btn-enter" type="button">決定</button>
+
+      <div id="usericons">
+        <img src="image/user_arupaka.png" width="100" height="100">
+        <img src="image/user_panda.png" width="100" height="100"><br>
+        <span class="text-muted">※ユーザーアイコンはランダムに決定されます</span>
+      </div>
+
+      <nav class="navbutton">
+        <!-- 左に寄せる -->
+        <div class="btnleft">
+          <button id="btn-back" type="button">もどる</button>
+        </div>
+
+        <!-- 右に寄せる -->
+        <div class="btnright">
+          <button id="btn-enter" type="button">つぎへ</button>
+        </div>
+      </nav>
     </form>
   </div>
 
+<script src="js/lib.js"></script>
 <script>
 const playername = document.querySelector('#playername');
 
 // ページの読み込みが完了
 window.addEventListener('load', ()=>{
-  setRandomName();
+  const name = loadName();
+  if( name !== null ){
+    playername.value = name;
+  }
+  else{
+    setRandomName();
+  }
 })
 
 // 「再セット」ボタン押下
@@ -60,10 +115,24 @@ document.querySelector('#btn-reload').addEventListener('click', ()=>{
   setRandomName();
 });
 
-// 「決定」ボタン押下
+// 「もどる」ボタン押下
+document.querySelector('#btn-back').addEventListener('click', ()=>{
+  saveName();
+  location.href = 'index.html';
+});
+
+// 「つぎへ」ボタン押下
 document.querySelector('#btn-enter').addEventListener('click', ()=>{
-  localStorage.setItem('playername', playername.value);
-  location.href = 'game.html';
+  console.log(strCount(playername.value))
+  // 入力チェック
+  if( playername.value === '' || strCount(playername.value) > 12 ){
+    alert('名前を正しく入力してください');
+    playername.focus();
+    return;
+  }
+
+  saveName();
+  //location.href = 'game.html';
 });
 
 /**
@@ -73,6 +142,20 @@ function setRandomName(){
   const names = ['パンダ', 'アルパカ', 'ぬこ', 'くま', 'イルカ'];
   const i = Math.floor( (Math.random() * 10) % names.length );
   playername.value = names[i];
+}
+
+/**
+ * 入力中の名前をlocalStorageへ保存
+ */
+function saveName(){
+  localStorage.setItem('playername', playername.value);
+}
+
+/**
+ * 名前をlocalStorageから取得
+ */
+function loadName(){
+  return localStorage.getItem('playername');    // 存在しない場合はNullが返る
 }
 </script>
 </body>

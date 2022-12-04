@@ -1,18 +1,18 @@
 # 素材の取得元
 
-<dl>
-<dt>logo.png</dt>
-<dd>
-    <a href="https://aniani.me/danmachi/">ダンまちロゴジェネレーター</a>
-</dd>
+## [いらすとや](https://www.irasutoya.com/)
 
-<dt>back_title.jpg</dt>
-<dd>
-    <a href="https://gakaisozai.seesaa.net/article/200812article_2.html">きまぐれアフター</a>
-</dd>
-<dt>icon_rotate.svg</dt>
+* [user_arupaka.png](https://www.irasutoya.com/2013/10/blog-post_9165.html)
+* [user_panda.png](https://www.irasutoya.com/2013/10/blog-post_9165.html)
 
-<dd>
-    <a href="https://fontawesome.com/icons/rotate-right?s=solid&f=classic">FontAwesome</a>
-</dd>
-</dl>
+## [ダンまちロゴジェネレーター](https://aniani.me/danmachi/)
+
+* logo.png
+
+## [きまぐれアフター](http://www5d.biglobe.ne.jp/~gakai/)
+
+* [back_title.jpg](https://gakaisozai.seesaa.net/article/200812article_2.html)
+
+## [FontAwesome](https://fontawesome.com/)
+
+* [icon_rotate.svg](https://fontawesome.com/icons/rotate-right?s=solid&f=classic)
