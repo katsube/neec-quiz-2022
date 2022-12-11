@@ -1,7 +1,7 @@
 body{
     width: 100%;
     text-align: center;
-    background-image: url(image/back_title.jpg);
+    background-image: url(/image/back_title.jpg);
     background-size: cover;
 }
 #inputwindow{

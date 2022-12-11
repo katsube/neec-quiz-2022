@@ -1,3 +1,105 @@
+//------------------------------------------------
+// 状態管理
+//------------------------------------------------
+let BGM1 = null;   // BGMの状態
+
+//------------------------------------------------
+// 定数
+//------------------------------------------------
+//-----------------------
+// アセット
+//-----------------------
+const ASSETS = {
+  'bgm':{
+    'title': '/sound/bgm/bgm_title.mp3',
+    'name':  '/sound/bgm/bgm_name.mp3',
+  },
+  'se':{
+    'click':  '/sound/se/se_click1.mp3',
+    'enter':  '/sound/se/se_enter1.mp3',
+    'cancel': '/sound/se/se_cancel1.mp3'
+  }
+};
+
+//-----------------------
+// ライブラリ
+//-----------------------
+const JSLIB = [
+  '/js/howler.min.js' // 音声再生ライブラリ
+];
+
+// ライブラリの読み込み
+(()=>{
+  JSLIB.forEach((path)=>{
+    const script = document.createElement('script');
+    script.src = path;
+    document.body.appendChild(script);
+  });
+})();
+
+
+/**
+ * BGMを再生する
+ *
+ * @param {string} name
+ * @param {function} callback
+ */
+function playBGM(name, callback=null){
+  // 再生中のBGMがあれば停止する
+  if( BGM1 !== null ){
+    BGM1.stop();
+  }
+
+  // ファイルを準備
+  const file = ASSETS.bgm[name];
+  BGM1 = new Howl({
+    src: [file],
+    loop: true,
+    autoplay: true
+  });
+
+  // 再生が終了したら実行する
+  BGM1.on('end', ()=>{
+    if(callback !== null){
+      callback();
+    }
+    BGM1 = null;
+  });
+
+  // 再生する
+  BGM1.play();
+}
+
+/**
+ * BGMを停止する
+ */
+function stopBGM(){
+  if( BGM1 !== null ){
+    BGM1.stop();
+  }
+}
+
+/**
+ * SEを再生する
+ *
+ * @param {string} name
+ */
+function playSE(name, callback=null){
+  const se = new Audio(ASSETS.se[name]);
+
+  // SEの再生が終了したら実行する
+  se.addEventListener('ended', ()=>{
+    if(callback !== null){
+      callback();
+    }
+  });
+
+  // 再生
+  se.play();
+}
+
+
+
 /*
  * 文字数をカウントする
  */

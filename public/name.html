@@ -49,6 +49,8 @@ window.addEventListener('load', ()=>{
   else{
     setRandomName();
   }
+
+  playBGM('name');
 })
 
 // 「再セット」ボタン押下
@@ -59,7 +61,10 @@ document.querySelector('#btn-reload').addEventListener('click', ()=>{
 // 「もどる」ボタン押下
 document.querySelector('#btn-back').addEventListener('click', ()=>{
   saveName();
-  location.href = 'index.html';
+  stopBGM();
+  playSE('cancel', ()=>{
+    location.href = 'index.html';
+  });
 });
 
 // 「つぎへ」ボタン押下
@@ -74,7 +79,10 @@ document.querySelector('#btn-enter').addEventListener('click', ()=>{
   }
 
   saveName();
-  location.href = 'game.html';
+  stopBGM();
+  playSE('enter', ()=>{
+    location.href = 'game.html';
+  });
 });
 
 /**
