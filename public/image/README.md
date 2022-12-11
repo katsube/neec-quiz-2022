@@ -13,6 +13,16 @@
 
 * [back_title.jpg](https://gakaisozai.seesaa.net/article/200812article_2.html)
 
+## [AIPICT](https://aipict.com/)
+
+* [back_game.png](https://aipict.com/cave_underground/)
+
 ## [FontAwesome](https://fontawesome.com/)
 
 * [icon_rotate.svg](https://fontawesome.com/icons/rotate-right?s=solid&f=classic)
+* [circle.svg](https://fontawesome.com/icons/circle?s=regular&f=classic)
+* [xmark.svg](https://fontawesome.com/icons/xmark?s=solid&f=classic)
+
+## [SVG-Loaders](https://github.com/SamHerbert/SVG-Loaders)
+
+* icon_matching.svg

@@ -4,29 +4,35 @@
   <meta charset="utf8">
   <title>クイズゲーム</title>
   <link rel="stylesheet" href="css/style.css">
-  <style>
-    #gamewindow{
-      display: none;
-    }
-  </style>
+  <link rel="stylesheet" href="css/game.css">
 </head>
 <body>
 
 <section id="nowmatching">
-  <h1>...マッチング中</h1>
-  <p>Please waiting</p>
+  <div class="inner">
+    <h1>
+      <img src="/image/icon_matching.svg" width="80">
+      マッチング中
+    </h1>
+    <p>Please wait a few seconds.</p>
+  </div>
 </section>
 
 <section id="gamewindow">
-  <h1>ゲーム開始</h1>
+  <h1 id="question"></h1>
+  <div id="choices">
+    <img id="maru"  src="/image/circle.svg" width="200" height="200" alt="マル">
+    <img id="batsu" src="/image/xmark.svg" width="200" height="200" alt="バツ">
+  </div>
 </section>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="js/lib.js"></script>
 <script>
 const IAM = {
-  token: null,
-  name: null
+  id: null,     // 公開用のID
+  token: null,  // 秘密トークン
+  name: null    // 名前
 }
 
 //----------------------------------------
@@ -46,28 +52,107 @@ if( IAM.name === null ){
 const socket = io();
 
 // トークンが返ってきたら入室する
-socket.on('token', (token)=>{
-  IAM.token = token;
+socket.on('token', (data)=>{
+  IAM.token = data.token;
+  IAM.id    = data.id;
 
   // 入室する
   socket.emit('join', {
-    token,    // token:token と同じ意味になる
-    name      // name:name と同じ意味になる
+    token: IAM.token,
+    name: IAM.name
   });
 });
 
+// すでにゲームが始まっていたら入室失敗
+socket.on('join-fail', (data)=>{
+  alert('入室に失敗しました。\nしばらくしてから再度お試しください。');
+  location.href = 'name.html';
+})
+
 // 二人揃ったらサーバから開始の合図が来る
-socket.on('start', (token)=>{
+socket.on('start', (data)=>{
+  console.log('start', data);
+
+  // 問題文を表示
+  document.getElementById('question').innerHTML = data.question;
+
+  // プレイヤーを表示
+  for(let i=0; i<data.members.length; i++){
+    const user = data.members[i];
+    drawUnit(user.id, user);
+  }
+
   // 画面を切り替える
   document.getElementById('nowmatching').style.display = 'none';
   document.getElementById('gamewindow').style.display = 'block';
 });
 
-
 //----------------------------------------
 // STEP2. ゲーム開始
 //----------------------------------------
+// WASDを押したらサーバに送信
+window.addEventListener('keydown', (e)=>{
+  const key = e.keyCode;
+  const data = {token: IAM.token, key};
+  socket.emit('move', data);
+  console.log('keydown',data);
+});
 
+// サーバから移動の合図が来たら移動する
+socket.on('member-move', (user)=>{
+  console.log('member-move',user);
+  drawUnit(user.id, user);
+});
+
+
+/**
+ * ユニットを描画する
+ *
+ * @param {string} id   ユニットのID
+ * @param {object} unit ユニットの情報
+ *                         1回目   {avatar:'image.png', name:'名前', pos:{x:0, y:0}}
+ *                         2回目〜 {pos:{x:0, y:0}}
+ * @return {void}
+ */
+function drawUnit(id, unit){
+  console.log('drawUnit', id, unit);
+  const baseid = `unit-${id}`;
+  let div = document.querySelector(`#${baseid}`)
+
+  //-----------------------------------
+  // 既存の要素が無ければ作成
+  //-----------------------------------
+  if( div === null ){
+    div = document.createElement('div');
+    div.id = baseid;
+    div.classList.add('unit');
+
+    // 画像をセット
+    const image = document.createElement('img');
+    image.src = unit.avatar;
+    image.alt = unit.name;
+
+    // プレイヤー名をセット
+    const name  = document.createElement('p');
+    name.innerHTML = unit.name;
+
+    // 画面に追加
+    div.appendChild(name);
+    div.appendChild(image);
+    document.querySelector('#gamewindow').appendChild(div);
+  }
+
+  //-----------------------------------
+  // 座標を移動
+  //-----------------------------------
+  // gamewindowの座標を取得
+  const gamewindow = document.querySelector('#gamewindow');
+  const gamewindowRect = gamewindow.getBoundingClientRect();
+
+  // gamewindow内の座標に変換し移動
+  div.style.top  = (gamewindowRect.top + unit.pos.y) + 'px';
+  div.style.left = (gamewindowRect.left + unit.pos.x) + 'px';
+}
 </script>
 </body>
 </html>
