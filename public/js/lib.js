@@ -1,7 +1,9 @@
 //------------------------------------------------
 // 状態管理
 //------------------------------------------------
-let BGM1 = null;   // BGMの状態
+let BGM1 = null;      // BGMの状態
+let BGM1Volume = 0.2; // BGMの音量
+let SEVolume = 0.5;   // SEの音量
 
 //------------------------------------------------
 // 定数
@@ -54,8 +56,9 @@ function playBGM(name, callback=null){
   const file = ASSETS.bgm[name];
   BGM1 = new Howl({
     src: [file],
-    loop: true,
-    autoplay: true
+    loop: false,
+    autoplay: true,
+    volume: BGM1Volume
   });
 
   // 再生が終了したら実行する
@@ -86,6 +89,7 @@ function stopBGM(){
  */
 function playSE(name, callback=null){
   const se = new Audio(ASSETS.se[name]);
+  se.volume = SEVolume;
 
   // SEの再生が終了したら実行する
   se.addEventListener('ended', ()=>{
