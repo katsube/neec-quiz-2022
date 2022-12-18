@@ -1,4 +1,5 @@
 /**
+import collision from './lib/collision';
  * クイズゲームサーバー
  *
  * Usage:
@@ -14,24 +15,21 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
+// 定数ファイル
+const Define = require('./config/define');
+
 // 問題文を管理するクラス
 const Question = require('./lib/question');
 
 // キーコード
 const KeyCode = require('./lib/keycode');
 
+// 当たり判定
+const Collision = require('./lib/collision');
+
 //-----------------------------------------------
 // グローバル変数
 //-----------------------------------------------
-//-----------------------------
-// サーバー
-//-----------------------------
-// 世界中に公開するフォルダ
-const DOCUMENT_ROOT = __dirname + '/public';
-
-// サーバのポート番号
-const PORT = 3000;
-
 //-----------------------------
 // 参加者
 //-----------------------------
@@ -42,22 +40,17 @@ const MEMBERS = {
   //   token:'xxx',
   //   name:'あるぱか',
   //   avatar:'/image/user_arupaka.png'
-  //   pos: {x:0, y:0}
+  //   pos: {x:0, y:0, width:120, height:150},
+  //   answer: true,   // true:○, false:×, null:未回答
   //},
 };
 let MEMBERS_COUNT = 1;
 
-// 最大同時参加者数
-const MAXPLAYERS = 2;
-
 //-----------------------------
 // ゲーム関係
 //-----------------------------
-// モニタリング間隔（ミリ秒）
-const MONITORING_TIME = 1000;
-
 // 現在のサーバーモード
-let SERVER_MODE = 'MATCIHING';  // 'MATCIHING' or 'GAME'
+let SERVER_MODE = 'MATCHING';  // 'MATCHING' or 'GAME'
 
 // 問題を管理する
 const QUESTION = {
@@ -65,19 +58,13 @@ const QUESTION = {
   a: null
 };
 
-// アバターの一覧
-const AVATARS = [
-  '/image/user_arupaka.png',
-  '/image/user_panda.png'
-];
-
-
 //-----------------------------------------------
 // ルーティング（express）
 //-----------------------------------------------
 // 静的なファイルを公開する
 // （動的なファイルはルーティングの設定が必要）
-app.use(express.static(DOCUMENT_ROOT));
+app.use(express.static(Define.SERVER.DOCUMENT_ROOT));
+console.log(Define.SERVER.DOCUMENT_ROOT);
 
 
 //-----------------------------------------------
@@ -95,11 +82,17 @@ io.on('connection', (socket) => {
 
   // 参加者リストに追加
   MEMBERS[socket.id] = {
-    id: MEMBERS_COUNT,
-    token: token,
-    name: null,
-    avatar: null,
-    pos: {x:0, y:0}
+    id: MEMBERS_COUNT,    // 公開用ID
+    token: token,         // 秘密トークン
+    name: null,           // プレイヤー名
+    avatar: null,         // アバター画像URL
+    pos: {                // プレイヤー画像の座標とサイズ
+      x: 0,
+      y: 0,
+      width: Define.PLAYER.SIZE.width,
+      height: Define.PLAYER.SIZE.height
+    },
+    answer: null          // 回答結果
   };
   MEMBERS_COUNT++;
 
@@ -108,32 +101,31 @@ io.on('connection', (socket) => {
   //---------------------------
   socket.on('join', (data) => {
     console.log('join', data);
+    const user = MEMBERS[socket.id];
+
     // マッチングモードで無ければ何もしない
-    if( SERVER_MODE !== 'MATCIHING' ){
+    if( SERVER_MODE !== 'MATCHING' ){
       console.log('マッチングモードでは無いため無視します');
       io.to(socket.id).emit('join-fail', {message:'マッチングモードで無いため入室できません'});
       return;
     }
     // トークンを検証
-    if(data.token !== MEMBERS[socket.id].token){
+    if(data.token !== user.token){
       console.log('トークンが一致しません');
       return;
     }
 
     // 参加者リストに追加
-    MEMBERS[socket.id].name = data.name;
+    user.name = data.name;
 
     // アバター画像を決定
-    const id = MEMBERS[socket.id].id;
-    const avatar_len = AVATARS.length;
-    MEMBERS[socket.id].avatar = AVATARS[id % avatar_len];
+    const id = user.id;
+    const avatar_len = Define.PLAYER.AVATARS.length;
+    user.avatar = Define.PLAYER.AVATARS[id % avatar_len];
 
     // 初期座標を決定
-    const pos = {
-      x: id * 150,  // 150pxずつずらす
-      y: 250        // 固定
-    };
-    MEMBERS[socket.id].pos = pos;
+    user.pos.x = id * 150;  // 150pxずつずらす
+    user.pos.y = 250;       // 固定
   });
 
   //---------------------------
@@ -141,13 +133,15 @@ io.on('connection', (socket) => {
   //---------------------------
   socket.on('move', (data) => {
     console.log('move', data);
+    const user = MEMBERS[socket.id];
+
     // ゲームモードで無ければ何もしない
     if( SERVER_MODE !== 'GAME' ){
       console.log('ゲームモードでは無いため無視します')
       return;
     }
     // トークンを検証
-    if(data.token !== MEMBERS[socket.id].token){
+    if(data.token !== user.token){
       console.log('トークンが一致しません');
       return;
     }
@@ -155,11 +149,23 @@ io.on('connection', (socket) => {
     // 座標を移動
     const ismove = moveChara(socket.id, data.key);
 
+    // 回答判定
+    if( Collision(Define.GAME.ANSWER_POS.o, user.pos) ){
+      console.log(`ANSWER ${user.name} ○`);
+      user.answer = Define.GAME.ANSWER.O;   // ○
+    }
+    else if( Collision(Define.GAME.ANSWER_POS.x, user.pos) ){
+      console.log(`ANSWER ${user.name} ✕`);
+      user.answer = Define.GAME.ANSWER.X;   // ✕
+    }
+    else{
+      console.log(`ANSWER ${user.name} 未回答`);
+      user.answer = Define.GAME.ANSWER.NOT_SELECT;   // 未回答
+    }
+
     // 全ユーザーに通知
     if(ismove){
-      const id  = MEMBERS[socket.id].id;
-      const pos = MEMBERS[socket.id].pos;
-      io.emit('member-move', {id, pos});
+      io.emit('member-move', {id:user.id, pos:user.pos});
     }
   });
 });
@@ -167,8 +173,8 @@ io.on('connection', (socket) => {
 //------------------------------
 // サーバ起動
 //------------------------------
-http.listen(PORT, () => {
-  console.log(`サーバを起動しました localhost:${PORT}`);
+http.listen(Define.SERVER.PORT, () => {
+  console.log(`サーバを起動しました localhost:${Define.SERVER.PORT}`);
 });
 
 //------------------------------
@@ -178,9 +184,9 @@ setInterval(() => {
   //------------------------------
   // マッチング中
   //------------------------------
-  if(SERVER_MODE === 'MATCIHING'){
+  if(SERVER_MODE === 'MATCHING'){
     // 2人以上いたらゲーム開始
-    if(countConnectMembers() >= MAXPLAYERS){
+    if(countConnectMembers() >= Define.PLAYER.MAXPLAYERS){
       console.log('ゲーム開始');
       SERVER_MODE = 'GAME';
 
@@ -193,16 +199,35 @@ setInterval(() => {
       const members = createMemberList();
 
       // クライアントに送信
-      io.emit('start', {question: QUESTION.q, members});
+      io.emit('start', {
+          question: QUESTION.q,
+          answer_pos: Define.GAME.ANSWER_POS,
+          members
+      });
     }
   }
   //------------------------------
   // ゲーム中
   //------------------------------
   else if(SERVER_MODE === 'GAME'){
-    // ToDo: 次回以降追加
+    // 全員が回答したら結果を送信
+    if( isAllAnswer() ){
+      const result = judgeResult();
+      console.log('結果送信', result);
+
+      // クライアントに結果送信
+      io.emit('result', {
+        answer: QUESTION.a,     // 正解
+        result
+      });
+
+      // 初期化してマッチングモードに戻す
+      resetMembers();
+      SERVER_MODE = 'MATCHING';
+    }
+
   }
-}, MONITORING_TIME);
+}, Define.GAME.MONITORING_TIME);
 
 
 /**
@@ -213,7 +238,7 @@ setInterval(() => {
  * @param {number} step  移動量
  * @return {boolean} 移動したかどうか
  */
-function moveChara(socketid, keycd, step=10){
+function moveChara(socketid, keycd, step=20){
   const user = MEMBERS[socketid];
   let flag = false;   // 移動したかどうか
 
@@ -265,6 +290,52 @@ function createMemberList(){
 }
 
 /**
+ * 参加者が全員回答したか判定する
+ *
+ * @returns {boolean}
+ */
+function isAllAnswer(){
+  let flag = false;  // 全員回答したかどうか
+
+  for(let key in MEMBERS){
+    const user = MEMBERS[key];
+    if(user.name === null && user.name === ''){
+      continue;
+    }
+
+    switch (user.answer){
+      case Define.GAME.ANSWER.O:
+      case Define.GAME.ANSWER.X:
+        flag = true;
+        break;
+      case Define.GAME.ANSWER.NOT_SELECT:
+      default:
+        return(false);
+    }
+  }
+
+  return(flag);
+}
+
+/**
+ * 参加者の勝敗判定を行う
+ *
+ * @returns {object} {'aaa':1, 'bbb':0}
+ */
+function judgeResult(){
+  const result = {};
+  for(let key in MEMBERS){
+    const user = MEMBERS[key];
+    if(user.name === null && user.name === ''){
+      continue;
+    }
+    result[user.id] = (user.answer === QUESTION.a)? 1:0;
+  }
+  return(result);
+}
+
+
+/**
  * 現在の参加者数をカウント
  *
  * @returns {number}
@@ -278,6 +349,21 @@ function countConnectMembers(){
     }
   }
   return(count);
+}
+
+/**
+ * 参加者一覧をリセットする
+ *
+ * @returns {void}
+ */
+function resetMembers(){
+  for(let key in MEMBERS){
+    delete MEMBERS[key];
+  }
+
+  // 冒頭で const MEMBERS = {}; としているため
+  // MEMBERS = {}; とするとエラーになる。
+  // （constは異なるオブジェクトの代入を禁止するため）
 }
 
 /**

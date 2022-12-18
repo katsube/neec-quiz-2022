@@ -22,6 +22,7 @@
 * [icon_rotate.svg](https://fontawesome.com/icons/rotate-right?s=solid&f=classic)
 * [circle.svg](https://fontawesome.com/icons/circle?s=regular&f=classic)
 * [xmark.svg](https://fontawesome.com/icons/xmark?s=solid&f=classic)
+* [correct.svg](https://fontawesome.com/icons/circle-check?s=regular&f=classic)
 
 ## [SVG-Loaders](https://github.com/SamHerbert/SVG-Loaders)
 
