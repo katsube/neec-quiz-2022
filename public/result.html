@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf8">
+  <title>結果画面 | クイズゲーム</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/result.css">
+</head>
+<body>
+
+<div id="resultwindow">
+  <h1 id="title"></h1>
+  <nav class="navbutton">
+    <div class="btnCenter">
+      <button id="btn-enter" type="button">タイトルへ</button>
+    </div>
+  </nav>
+</div>
+
+<script src="js/lib.js"></script>
+<script>
+// ページの読み込みが完了
+window.addEventListener('load', ()=>{
+  // 結果をクエリー文字列から取得
+  const params = new URLSearchParams(location.search);
+	const result = params.get('result');
+
+  // 表示
+  const title = document.querySelector('#title');
+  const body = document.querySelector('body');
+  switch( result ){
+    case 'win':
+      title.textContent = 'あなたの勝ちです！';
+      body.style.backgroundImage = 'url(/image/back_result_win.jpg)';
+      playBGM('win');
+      break;
+    case 'lose':
+      title.textContent = 'あなたの負けです';
+      body.style.backgroundImage = 'url(/image/back_game.png)';
+      playBGM('lose');
+      break;
+    case 'draw':
+      title.textContent = '引き分けです';
+      body.style.backgroundImage = 'url(/image/back_game.png)';
+      playBGM('lose');
+      break;
+    default:
+      title.textContent = '結果が取得できませんでした';
+      body.style.backgroundImage = 'url(/image/back_game.png)';
+      break;
+  }
+})
+
+// 「つぎへ」ボタン押下
+document.querySelector('#btn-enter').addEventListener('click', ()=>{
+  stopBGM();
+  playSE('enter', ()=>{
+    location.href = '/';
+  });
+});
+</script>
+</body>
+</html>

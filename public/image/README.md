@@ -22,7 +22,12 @@
 * [icon_rotate.svg](https://fontawesome.com/icons/rotate-right?s=solid&f=classic)
 * [circle.svg](https://fontawesome.com/icons/circle?s=regular&f=classic)
 * [xmark.svg](https://fontawesome.com/icons/xmark?s=solid&f=classic)
+* [correct.svg](https://fontawesome.com/icons/circle-check?s=regular&f=classic)
 
 ## [SVG-Loaders](https://github.com/SamHerbert/SVG-Loaders)
 
 * icon_matching.svg
+
+## [illust AC](https://www.ac-illust.com/)
+
+* back_result_win.jpg [イラスト素材：財宝の山](https://www.ac-illust.com/main/detail.php?id=1174983)

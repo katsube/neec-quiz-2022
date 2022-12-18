@@ -20,9 +20,8 @@
 
 <section id="gamewindow">
   <h1 id="question"></h1>
-  <div id="choices">
-    <img id="maru"  src="/image/circle.svg" width="200" height="200" alt="マル">
-    <img id="batsu" src="/image/xmark.svg" width="200" height="200" alt="バツ">
+  <div id="answer">
+    <img src="/image/correct.svg" width="80">
   </div>
 </section>
 
@@ -34,6 +33,7 @@ const IAM = {
   token: null,  // 秘密トークン
   name: null    // 名前
 }
+let ANSWER_POS;
 
 //----------------------------------------
 // STEP0. 前画面の情報を取り出す
@@ -76,15 +76,25 @@ socket.on('start', (data)=>{
   // 問題文を表示
   document.getElementById('question').innerHTML = data.question;
 
+  // 画面を切り替える
+  document.getElementById('nowmatching').style.display = 'none';
+  document.getElementById('gamewindow').style.display = 'block';
+
   // プレイヤーを表示
   for(let i=0; i<data.members.length; i++){
     const user = data.members[i];
     drawUnit(user.id, user);
   }
 
-  // 画面を切り替える
-  document.getElementById('nowmatching').style.display = 'none';
-  document.getElementById('gamewindow').style.display = 'block';
+  // マルバツを表示
+  ANSWER_POS = data.answer_pos;
+  drawAnswer();
+
+  // BGMを再生
+  playBGM('battle');
+
+  // ウィンドウサイズが変更になったら○✕を再描画
+  window.addEventListener('resize', drawAnswer);
 });
 
 //----------------------------------------
@@ -104,6 +114,43 @@ socket.on('member-move', (user)=>{
   drawUnit(user.id, user);
 });
 
+
+//----------------------------------------
+// STEP3. 正解表示
+//----------------------------------------
+socket.on('finish', (data)=>{
+  console.log('finish', data);
+
+  // Socket.IOサーバとの接続を切る
+  socket.disconnect();
+
+  // 正解を表示
+  playSE('finish');
+  drawCorrectAnswer(data.answer);
+
+  // 1.5秒後に結果画面へ遷移
+  setTimeout(()=>{
+    // 自分の勝敗を判定
+    const myscore = data.result[IAM.id];
+    delete data.result[IAM.id];
+    const enemyscore = Object.values(data.result)[0];
+
+    // 勝敗を判定
+    let result;
+    if( myscore > enemyscore ){
+      result = 'win';
+    }
+    else if( myscore < enemyscore ){
+      result = 'lose';
+    }
+    else{
+      result = 'draw';
+    }
+
+    // 移動
+    location.href = `result.html?result=${result}`;
+  }, 1500);
+});
 
 /**
  * ユニットを描画する
@@ -152,6 +199,75 @@ function drawUnit(id, unit){
   // gamewindow内の座標に変換し移動
   div.style.top  = (gamewindowRect.top + unit.pos.y) + 'px';
   div.style.left = (gamewindowRect.left + unit.pos.x) + 'px';
+}
+
+/**
+ * マルバツを描画する
+ *
+ * @return {void}
+ */
+function drawAnswer(){
+  drawAnswerItem('maru',  ANSWER_POS.o, 'image/circle.svg', 'lightblue');    // マル
+  drawAnswerItem('batsu', ANSWER_POS.x, 'image/xmark.svg',  'lightcoral');   // バツ
+}
+
+/**
+ * マル or バツを描画する
+ *
+ * @param {string} id    マル or バツのID
+ * @param {object} pos   マル or バツの座標 {x:0, y:0, width:100, height:100}
+ * @param {string} image マル or バツの画像
+ * @param {string} bgcolor マル or バツの背景色
+ * @return {void}
+ */
+function drawAnswerItem(id, pos, image, bgcolor){
+  console.log('drawAnswer', id, pos, image);
+  let img = document.querySelector(`#${id}`);
+
+  // 画像が無ければ新規に生成
+  if( img === null ){
+    img = document.createElement('img');
+    img.src = image;
+    img.id = id;
+    img.style.position = 'absolute';
+    img.style.width = pos.width + 'px';
+    img.style.height = pos.height + 'px';
+    img.style.backgroundColor = bgcolor;
+    img.style.borderRadius = '5px';   // 角を丸くする
+    img.style.zIndex = 25;
+
+    // 画面に追加
+    document.querySelector('#gamewindow').appendChild(img);
+  }
+
+  // gamewindowの座標を取得
+  const gamewindow = document.querySelector('#gamewindow');
+  const gamewindowRect = gamewindow.getBoundingClientRect();
+
+  // 移動
+  img.style.top = (gamewindowRect.top + pos.y) + 'px';
+  img.style.left = (gamewindowRect.left + pos.x) + 'px';
+}
+
+/**
+ * 正解を表示する
+ *
+ * @param {boolean} answer 正解かどうか
+ */
+function drawCorrectAnswer(answer){
+  const pos = answer? ANSWER_POS.o : ANSWER_POS.x;
+  const div = document.querySelector('#answer');
+
+  // gamewindowの座標を取得
+  const gamewindow = document.querySelector('#gamewindow');
+  const gamewindowRect = gamewindow.getBoundingClientRect();
+
+  // 表示する
+  div.style.display = 'block';
+
+  // 移動
+  div.style.top = (gamewindowRect.top + pos.y) + 'px';
+  div.style.left = (gamewindowRect.left + pos.x) + 'px';
 }
 </script>
 </body>

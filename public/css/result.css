@@ -1,0 +1,37 @@
+body{
+    width: 100%;
+    text-align: center;
+    background-image: url(/image/back_title.jpg);
+    background-size: cover;
+}
+#resultwindow{
+    width: 400px;
+    height: 250px;
+    margin: 100px auto;
+    padding: 20px;
+    background-color: rgba(255,255,255,0.8);
+    border-radius: 5px;
+}
+h1{
+    font-size: 32pt;
+}
+#btn-enter{
+    margin-top: 10px;
+    width: 100px;
+    height: 40px;
+    background-color: cornflowerblue;
+    color: white;
+    font-weight: bold;
+    font-size: 12pt;
+}
+
+.navbutton{
+    margin-top: 20px;
+    margin-left: 30px;
+    margin-bottom: 10px;
+    width: 350px;
+    height: 35px;
+}
+.btnCenter{
+    text-align: center;
+}
