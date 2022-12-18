@@ -15,11 +15,15 @@ const ASSETS = {
   'bgm':{
     'title': '/sound/bgm/bgm_title.mp3',
     'name':  '/sound/bgm/bgm_name.mp3',
+    'battle': '/sound/bgm/bgm_battle.mp3',
+    'win':  '/sound/bgm/bgm_win.mp3',
+    'lose':  '/sound/bgm/bgm_lose.mp3',
   },
   'se':{
     'click':  '/sound/se/se_click1.mp3',
     'enter':  '/sound/se/se_enter1.mp3',
-    'cancel': '/sound/se/se_cancel1.mp3'
+    'cancel': '/sound/se/se_cancel1.mp3',
+    'finish': '/sound/se/se_finish1.mp3',
   }
 };
 

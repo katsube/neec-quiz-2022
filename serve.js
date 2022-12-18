@@ -216,7 +216,7 @@ setInterval(() => {
       console.log('結果送信', result);
 
       // クライアントに結果送信
-      io.emit('result', {
+      io.emit('finish', {
         answer: QUESTION.a,     // 正解
         result
       });
@@ -224,6 +224,7 @@ setInterval(() => {
       // 初期化してマッチングモードに戻す
       resetMembers();
       SERVER_MODE = 'MATCHING';
+      console.log('マッチングモードに戻ります');
     }
 
   }
