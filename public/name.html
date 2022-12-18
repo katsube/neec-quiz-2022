@@ -4,66 +4,7 @@
   <meta charset="utf8">
   <title>名前入力 | クイズゲーム</title>
   <link rel="stylesheet" href="css/style.css">
-  <style>
-    body{
-      width: 100%;
-      text-align: center;
-      background-image: url(image/back_title.jpg);
-      background-size: cover;
-    }
-    #inputwindow{
-      width: 400px;
-      margin: 100px auto;
-      padding: 20px;
-      background-color: rgba(255,255,255,0.8);
-      border-radius: 5px;
-    }
-    h1{
-      font-size: 16pt;
-    }
-    #playername{
-      width: 250px;
-      height: 30px;
-    }
-    #btn-reload{
-      margin-top: 3px;
-    }
-    #usericons{
-      margin-top: 30px;
-    }
-    #usericons img{
-      margin-left: 20px;
-    }
-    #btn-back{
-      margin-top: 10px;
-      width: 80px;
-      height: 35px;
-    }
-    #btn-enter{
-      margin-top: 10px;
-      width: 100px;
-      height: 40px;
-      background-color: cornflowerblue;
-      color: white;
-      font-weight: bold;
-      font-size: 12pt;
-    }
-
-    .navbutton{
-      margin-top: 20px;
-      margin-left: 30px;
-      margin-bottom: 10px;
-      width: 350px;
-      height: 35px;
-    }
-    .btnleft{
-      float: left;
-      text-align: left;
-    }
-    .btnright{
-      text-align: right;
-    }
-  </style>
+  <link rel="stylesheet" href="css/name.css">
 </head>
 <body>
   <div id="inputwindow">
@@ -108,6 +49,8 @@ window.addEventListener('load', ()=>{
   else{
     setRandomName();
   }
+
+  playBGM('name');
 })
 
 // 「再セット」ボタン押下
@@ -118,7 +61,10 @@ document.querySelector('#btn-reload').addEventListener('click', ()=>{
 // 「もどる」ボタン押下
 document.querySelector('#btn-back').addEventListener('click', ()=>{
   saveName();
-  location.href = 'index.html';
+  stopBGM();
+  playSE('cancel', ()=>{
+    location.href = 'index.html';
+  });
 });
 
 // 「つぎへ」ボタン押下
@@ -133,7 +79,10 @@ document.querySelector('#btn-enter').addEventListener('click', ()=>{
   }
 
   saveName();
-  location.href = 'game.html';
+  stopBGM();
+  playSE('enter', ()=>{
+    location.href = 'game.html';
+  });
 });
 
 /**

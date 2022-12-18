@@ -30,9 +30,16 @@
   </form>
 </div>
 
+<script src="/js/lib.js"></script>
 <script>
+window.addEventListener("load", ()=>{
+  playBGM('title');
+});
 document.querySelector("#btn-start").addEventListener("click", ()=>{
-  location.href = "name.html";
+  stopBGM();
+  playSE('enter', ()=>{
+    location.href = "name.html";
+  });
 });
 </script>
 </body>

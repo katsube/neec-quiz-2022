@@ -1,0 +1,118 @@
+/*----------------------------------------------*/
+/* 共通                                         */
+/*----------------------------------------------*/
+body{
+    background-color: #000;
+}
+
+/*----------------------------------------------*/
+/* マッチング中                                 */
+/*----------------------------------------------*/
+#nowmatching{
+    box-sizing: border-box;
+    width: 100%;
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+#nowmatching .inner{
+    width: 500px;
+    height: 200px;
+    text-align: center;
+}
+#nowmatching .inner h1{
+    font-size: 56px;
+    margin-bottom: 5px;
+}
+#nowmatching .inner p{
+    font-size: 24px;
+}
+
+/*----------------------------------------------*/
+/* ゲーム本編                                   */
+/*----------------------------------------------*/
+/*------------------------*/
+/* 外側                   */
+/*------------------------*/
+#gamewindow{
+    display: none;
+    width: 1024px;
+    height: 700px;
+    margin: auto;
+    background-image: url(/image/back_game.png);
+    background-size: cover;
+    border-radius: 10px;
+    z-index: 1;
+}
+
+/*------------------------*/
+/* 問題文                 */
+/*------------------------*/
+#question{
+    position: relative;
+    top: 50px;
+    left: 187px;
+    width: 650px;
+    height: 130px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: rgba(0, 255, 100, 0.5);
+    padding: 10px;
+    font-size: 38px;
+    z-index: 100;
+}
+
+/*------------------------*/
+/* 選択肢                 */
+/*------------------------*/
+/* マル */
+#maru{
+    position: relative;
+    top: 250px;
+    left: 200px;
+    background-color: lightblue;
+    border-radius: 5px;
+    width: 150px;
+    height: 150px;
+    min-width: 150px;
+    min-height: 150px;
+    padding: 20px;
+    z-index: 25;
+}
+/* バツ */
+#batsu{
+    position: relative;
+    top: 250px;
+    left: 470px;
+    background-color: lightcoral;
+    border-radius: 5px;
+    width: 150px;
+    height: 150px;
+    padding: 20px;
+    z-index: 25;
+}
+
+/*------------------------*/
+/* プレイヤー             */
+/*------------------------*/
+.unit{
+    position: absolute;
+    width: 120px;
+    height: 150px;
+    text-align: center;
+    z-index: 50;
+}
+.unit img{
+    width: 100px;
+    height: 100px;
+}
+.unit p{
+    width: 100%;
+    height: 30px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    margin: 0;
+    padding: 2 0 0 0;
+}
